@@ -27,7 +27,7 @@ export default {
           show: true,
         },
         title: {
-          text: "当前数组",
+          text: "数组排序可视化演示",
         },
         legend: {
           data: ["元素数值"],

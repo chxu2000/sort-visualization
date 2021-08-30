@@ -300,6 +300,20 @@ export default {
               value: 0,
               label: "简单选择排序",
             },
+            {
+              value: 1,
+              label: "堆排序",
+            },
+          ],
+        },
+        {
+          value: 3,
+          label: "归并排序",
+          children: [
+            {
+              value: 0,
+              label: "2-路归并排序",
+            },
           ],
         },
       ],
@@ -347,7 +361,43 @@ export default {
       "changeOrder",
       "changeAniInt",
       "editElem",
+      "moveElem",
     ]),
+    shinePart(start, end, select = true) {
+      if (select) {
+        ((l, h) => {
+          setTimeout(() => {
+            this.selectPart([l, h]);
+          }, this.aniInt * this.timer - this.aniInt / 4);
+        })(start, end);
+        ((l, h) => {
+          setTimeout(() => {
+            this.deselectPart([l, h]);
+          }, this.aniInt * this.timer);
+        })(start, end);
+        ((l, h) => {
+          setTimeout(() => {
+            this.selectPart([l, h]);
+          }, this.aniInt * this.timer++ + this.aniInt / 4);
+        })(start, end);
+      } else {
+        ((l, h) => {
+          setTimeout(() => {
+            this.deselectPart([l, h]);
+          }, this.aniInt * this.timer - this.aniInt / 4);
+        })(start, end);
+        ((l, h) => {
+          setTimeout(() => {
+            this.selectPart([l, h]);
+          }, this.aniInt * this.timer);
+        })(start, end);
+        ((l, h) => {
+          setTimeout(() => {
+            this.deselectPart([l, h]);
+          }, this.aniInt * this.timer++ + this.aniInt / 4);
+        })(start, end);
+      }
+    },
     stepSort() {
       if (this.dataArr.length == 0 || this.dataArr.length == 1) {
         return;
@@ -372,6 +422,12 @@ export default {
       } else if (this.sortMethod[0] == 2) {
         if (this.sortMethod[1] == 0) {
           this.SelectSort();
+        } else if (this.sortMethod[1] == 1) {
+          this.HeapSort();
+        }
+      } else if (this.sortMethod[0] == 3) {
+        if (this.sortMethod[1] == 0) {
+          this.MergeSort();
         }
       }
       setTimeout(() => {
@@ -661,17 +717,17 @@ export default {
       ((l, h) => {
         setTimeout(() => {
           this.selectPart([l, h]);
-        }, this.aniInt * this.timer + this.aniInt / 4);
+        }, this.aniInt * this.timer - this.aniInt / 4);
       })(low, high);
       ((l, h) => {
         setTimeout(() => {
           this.deselectPart([l, h]);
-        }, this.aniInt * this.timer + this.aniInt / 2);
+        }, this.aniInt * this.timer);
       })(low, high);
       ((l, h) => {
         setTimeout(() => {
           this.selectPart([l, h]);
-        }, this.aniInt * this.timer++ + (3 * this.aniInt) / 4);
+        }, this.aniInt * this.timer++ + this.aniInt / 4);
       })(low, high);
       if (low < high) {
         var pivotloc = this.Partition(L, low, high);
@@ -833,6 +889,149 @@ export default {
       newDataArr.shift();
       console.log(newDataArr);
     },
+
+    // 堆排序
+    HeapSort() {
+      var i,
+        newDataArr = convertToNumList(this.dataArr);
+      newDataArr.unshift(0);
+      setTimeout(() => {
+        this.insertElem({ index: 0, value: 0 });
+      }, this.aniInt * this.timer++);
+      for (i = Math.floor((newDataArr.length - 1) / 2); i > 0; --i) {
+        this.HeapAdjust(newDataArr, i, newDataArr.length - 1);
+      }
+      for (i = newDataArr.length - 1; i > 1; --i) {
+        [newDataArr[1], newDataArr[i]] = [newDataArr[i], newDataArr[1]];
+        ((i) => {
+          setTimeout(() => {
+            this.selectPart([1, i]);
+            this.exchangeElem([1, i]);
+          }, this.aniInt * this.timer++);
+          setTimeout(() => {
+            this.deselectPart([1, i]);
+          }, this.aniInt * this.timer++);
+        })(i);
+        this.HeapAdjust(newDataArr, 1, i - 1);
+      }
+      newDataArr.shift();
+      setTimeout(() => {
+        this.deleteElem(0);
+      }, this.aniInt * this.timer++);
+      console.log(newDataArr);
+    },
+    HeapAdjust(H, s, m) {
+      this.shinePart(s, m);
+      var rc = H[s];
+      ((s, val) => {
+        setTimeout(() => {
+          this.deselectElem(s);
+          this.editElem({ index: 0, value: val });
+        }, this.aniInt * this.timer++);
+      })(s, H[s]);
+      for (var j = 2 * s; j <= m; j *= 2) {
+        ((j) => {
+          setTimeout(() => {
+            this.deselectElem(j);
+          }, this.aniInt * this.timer++);
+        })(j);
+        if (
+          j < m &&
+          ((this.ascendingOrder && H[j] < H[j + 1]) ||
+            (!this.ascendingOrder && H[j] > H[j + 1]))
+        ) {
+          ++j;
+          ((j) => {
+            setTimeout(() => {
+              this.selectElem(j - 1);
+              this.deselectElem(j);
+            }, this.aniInt * this.timer++);
+          })(j);
+        }
+        if (
+          !(
+            (this.ascendingOrder && rc < H[j]) ||
+            (!this.ascendingOrder && rc > H[j])
+          )
+        ) {
+          break;
+        }
+        H[s] = H[j];
+        ((s, j) => {
+          setTimeout(() => {
+            this.exchangeElem([s, j]);
+            this.selectElem(s);
+          }, this.aniInt * this.timer++);
+        })(s, j);
+        s = j;
+      }
+      H[s] = rc;
+    },
+
+    // 归并排序
+    MergeSort() {
+      var a = convertToNumList(this.dataArr),
+        b = a.concat([]),
+        len = a.length,
+        temp,
+        arr = a;
+      var seg, start, low, mid, high, k, start1, end1, start2, end2;
+      for (seg = 1; seg < len; seg += seg) {
+        for (start = 0; start < len; start += 2 * seg) {
+          low = start;
+          mid = Math.min(start + seg, len);
+          high = Math.min(start + 2 * seg, len);
+          k = low;
+          start1 = low;
+          end1 = mid;
+          start2 = mid;
+          end2 = high;
+
+          this.shinePart(start1, end1 - 1);
+          this.shinePart(start2, end2 - 1);
+
+          while (start1 < end1 && start2 < end2) {
+            if (
+              (this.ascendingOrder && a[start1] <= a[start2]) ||
+              (!this.ascendingOrder && a[start1] >= a[start2])
+            ) {
+              console.log("choose 1");
+            } else {
+              ((from, to) => {
+                setTimeout(() => {
+                  this.moveElem([from, to]);
+                }, this.aniInt * this.timer++);
+              })(start2, k);
+            }
+            b[k++] =
+              (this.ascendingOrder && a[start1] <= a[start2]) ||
+              (!this.ascendingOrder && a[start1] >= a[start2])
+                ? a[start1++]
+                : a[start2++];
+          }
+          ((start, end) => {
+            setTimeout(() => {
+              this.deselectPart([start, end - 1]);
+            }, this.aniInt * this.timer++);
+          })(low, high);
+          while (start1 < end1) {
+            b[k++] = a[start1++];
+          }
+          while (start2 < end2) {
+            b[k++] = a[start2++];
+          }
+        }
+        temp = a;
+        a = b;
+        b = temp;
+        console.log(a, b);
+      }
+      if (a != arr) {
+        for (var i; i < len; i++) {
+          b[i] = a[i];
+        }
+      }
+    },
   },
   watch: {
     aOrder(newValue) {
@@ -846,11 +1045,11 @@ export default {
 #tool-bar {
   margin: 30px auto;
   width: auto;
+  height: auto;
 }
 .box {
   width: 95%;
   margin-left: 20px;
-  margin-bottom: 30px;
   border-width: 2px;
   border-radius: 5px;
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);

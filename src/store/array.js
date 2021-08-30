@@ -80,6 +80,7 @@ export default {
     },
     // 修改某元素值
     editElem(state, { index, value }) {
+      console.log('editElem', index)
       var newDataArr = state.dataArr.concat([])
       newDataArr[index].value = value
       state.dataArr = newDataArr
@@ -132,6 +133,28 @@ export default {
       }
       state.dataArr = newDataArr
     },
+    // 移动某元素
+    moveElem(state, [from, to]) {
+      console.log("moveElem", from, to);
+      var i, newDataArr = state.dataArr.concat([]), tempId = state.idArr[from], tempData = state.dataArr[from];
+      if (from > to) {
+        for (i = from; i > to; --i) {
+          state.idArr[i] = state.idArr[i - 1];
+          newDataArr[i] = newDataArr[i - 1];
+        }
+        state.idArr[to] = tempId;
+        newDataArr[to] = tempData;
+      }
+      else {
+        for (i = from; i < to; ++i) {
+          state.idArr[i] = state.idArr[i + 1];
+          newDataArr[i] = newDataArr[i + 1];
+        }
+        state.idArr[to] = tempId;
+        newDataArr[to] = tempData;
+      }
+      state.dataArr = newDataArr;
+    }
   },
   state: {
     idArr: [],
