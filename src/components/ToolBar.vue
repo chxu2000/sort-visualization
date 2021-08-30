@@ -1,0 +1,908 @@
+<template>
+  <div>
+    <div id="tool-bar">
+      <el-row>
+        <el-col :span="8" class="v-col">
+          <div class="box">
+            <el-row class="h-row"> <h1>数组操作</h1> </el-row>
+            <el-row class="h-row">
+              <el-row class="m-row">
+                <el-row class="i-row">
+                  <h2>末尾插入随机数</h2>
+                </el-row>
+                <el-row>
+                  <el-col :span="5" class="v-col">
+                    <p>插入随机数数量</p>
+                  </el-col>
+                  <el-col :span="14" class="v-col">
+                    <el-input-number
+                      v-model="generateNum"
+                      :min="1"
+                      :max="10"
+                      label="插入数量"
+                    ></el-input-number>
+                  </el-col>
+                  <el-col :span="5" class="v-col">
+                    <el-button
+                      :disabled="disabled"
+                      @click="generateArr(generateNum)"
+                      >插入</el-button
+                    >
+                  </el-col>
+                </el-row>
+              </el-row>
+              <el-row class="m-row">
+                <el-col :span="19"> <h2>清空数组</h2> </el-col>
+                <el-col :span="5" class="v-col">
+                  <el-button :disabled="disabled" @click="clearArr"
+                    >清空</el-button
+                  >
+                </el-col>
+              </el-row>
+              <el-row class="m-row">
+                <el-col :span="19"> <h2>打乱数组顺序</h2> </el-col>
+                <el-col :span="5" class="v-col">
+                  <el-button :disabled="disabled" @click="shuffleArr"
+                    >打乱</el-button
+                  >
+                </el-col>
+              </el-row>
+              <el-row class="m-row">
+                <el-col :span="19"> <h2>数组直接排序</h2> </el-col>
+                <el-col :span="5" class="v-col">
+                  <el-button :disabled="disabled" @click="sortArr"
+                    >排序</el-button
+                  >
+                </el-col>
+              </el-row>
+              <el-row class="m-row">
+                <el-col :span="19"> <h2>数组分步排序</h2> </el-col>
+                <el-col :span="5" class="v-col">
+                  <el-button :disabled="disabled" @click="stepSort"
+                    >排序</el-button
+                  >
+                </el-col>
+              </el-row>
+            </el-row>
+          </div>
+        </el-col>
+        <el-col :span="8" class="v-col">
+          <div class="box">
+            <el-row class="h-row"> <h1>元素操作</h1> </el-row>
+            <el-row class="h-row">
+              <el-row class="m-row">
+                <el-row class="i-row">
+                  <h2>任意位置插入元素</h2>
+                </el-row>
+                <el-row>
+                  <el-col :span="5" class="v-col">
+                    <p>插入元素位置</p>
+                  </el-col>
+                  <el-col :span="19" class="v-col">
+                    <el-slider
+                      v-model="insertIndex"
+                      :min="0"
+                      :max="dataArr.length"
+                      label="插入元素位置"
+                      style="width: 80%"
+                    ></el-slider>
+                  </el-col>
+                </el-row>
+                <el-row>
+                  <el-col :span="5" class="v-col">
+                    <p>插入元素数值</p>
+                  </el-col>
+                  <el-col :span="14" class="v-col">
+                    <el-input-number
+                      v-model="insertValue"
+                      :min="-50"
+                      :max="50"
+                      label="插入元素数值"
+                    ></el-input-number>
+                  </el-col>
+                  <el-col :span="5" class="v-col">
+                    <el-button
+                      :disabled="disabled"
+                      @click="
+                        insertElem({ index: insertIndex, value: insertValue })
+                      "
+                      >插入</el-button
+                    >
+                  </el-col>
+                </el-row>
+              </el-row>
+              <el-row class="m-row">
+                <el-row class="i-row">
+                  <h2>删除任意位置元素</h2>
+                </el-row>
+                <el-row>
+                  <el-col :span="5" class="v-col">
+                    <p>删除元素位置</p>
+                  </el-col>
+                  <el-col :span="14" class="v-col">
+                    <el-slider
+                      v-model="deleteIndex"
+                      :min="0"
+                      :max="dataArr.length == 0 ? 0 : dataArr.length - 1"
+                      label="删除元素位置"
+                      style="width: 80%"
+                    ></el-slider>
+                  </el-col>
+                  <el-col :span="5" class="v-col">
+                    <el-button
+                      :disabled="disabled"
+                      @click="deleteElem(deleteIndex)"
+                      >删除</el-button
+                    >
+                  </el-col>
+                </el-row>
+              </el-row>
+            </el-row>
+          </div>
+        </el-col>
+        <el-col :span="8" class="v-col">
+          <div class="box last">
+            <el-row class="h-row"> <h1>排序选项</h1> </el-row>
+            <el-row class="h-row">
+              <el-row class="m-row">
+                <el-row class="i-row">
+                  <h2>排序类型</h2>
+                </el-row>
+                <el-row class="i-row">
+                  <el-radio
+                    :disabled="disabled"
+                    name="order"
+                    v-model="aOrder"
+                    :label="true"
+                    >非降序</el-radio
+                  >
+                  <el-radio
+                    :disabled="disabled"
+                    name="order"
+                    v-model="aOrder"
+                    :label="false"
+                    >非升序</el-radio
+                  >
+                </el-row>
+              </el-row>
+              <el-row class="m-row">
+                <el-row class="i-row">
+                  <h2>排序方式</h2>
+                </el-row>
+                <el-row class="i-row">
+                  <el-cascader
+                    :disabled="disabled"
+                    v-model="sortMethod"
+                    placeholder="请选择排序方式"
+                    :options="options"
+                  >
+                  </el-cascader>
+                </el-row>
+
+                <el-row
+                  v-show="sortMethod[0] == 0 && sortMethod[1] == 2"
+                  class="i-row s-row"
+                >
+                  <el-col :span="5" class="v-col">
+                    <p>增量序列长度</p>
+                  </el-col>
+                  <el-col :span="19" class="v-col">
+                    <el-input-number
+                      :disabled="disabled"
+                      v-model="dlta.length"
+                      :min="1"
+                      :max="5"
+                      label="插入数量"
+                      :step="1"
+                      @change="lenChange"
+                    ></el-input-number>
+                  </el-col>
+                </el-row>
+                <el-row
+                  v-show="sortMethod[0] == 0 && sortMethod[1] == 2"
+                  class="i-row"
+                  v-for="(value, index) of dlta"
+                  :key="index"
+                >
+                  <el-col :span="5" class="v-col s-line">
+                    <p>增量{{ index }}</p>
+                  </el-col>
+                  <el-col :span="19" class="v-col">
+                    <el-input-number
+                      :disabled="disabled"
+                      v-model="dlta[index]"
+                      :min="index == dlta.length - 1 ? 1 : dlta[index + 1] + 1"
+                      :max="maxDlta[index]"
+                      label="增量值"
+                      :step="1"
+                      controls-position="right"
+                      @change="dltChange(index)"
+                    ></el-input-number>
+                  </el-col>
+                </el-row>
+              </el-row>
+              <el-row class="m-row">
+                <el-row class="i-row">
+                  <h2>动画间隔 / ms</h2>
+                </el-row>
+                <el-row id="i-row">
+                  <el-slider
+                    :disabled="disabled"
+                    v-model="aniInt"
+                    :min="200"
+                    :max="1000"
+                    label="调整动画间隔"
+                    :step="10"
+                  ></el-slider>
+                </el-row>
+              </el-row>
+            </el-row>
+          </div>
+        </el-col>
+      </el-row>
+    </div>
+  </div>
+</template>
+
+<script>
+import { mapState, mapMutations } from "vuex";
+
+function convertToNumList(arr) {
+  var numList = [];
+  for (var i = 0; i < arr.length; i++) {
+    numList.push(arr[i].value);
+  }
+  return numList;
+}
+
+export default {
+  name: "ToolBar",
+  data() {
+    return {
+      options: [
+        {
+          value: 0,
+          label: "插入排序",
+          children: [
+            {
+              value: 0,
+              label: "直接插入排序",
+            },
+            {
+              value: 1,
+              label: "折半插入排序",
+            },
+            {
+              value: 2,
+              label: "希尔排序",
+            },
+          ],
+        },
+        {
+          value: 1,
+          label: "交换排序",
+          children: [
+            {
+              value: 0,
+              label: "冒泡排序",
+            },
+            {
+              value: 1,
+              label: "快速排序",
+            },
+          ],
+        },
+        {
+          value: 2,
+          label: "选择排序",
+          children: [
+            {
+              value: 0,
+              label: "简单选择排序",
+            },
+          ],
+        },
+      ],
+      generateNum: 5,
+      insertIndex: 0,
+      insertValue: 0,
+      deleteIndex: 0,
+      aOrder: true,
+      sortMethod: [0, 0],
+      timer: 0,
+      aniInt: 600,
+      dlta: [5, 3, 1],
+      disabled: false,
+    };
+  },
+  computed: {
+    ...mapState("arrayAbout", ["dataArr", "idArr", "ascendingOrder"]),
+    maxDlta() {
+      var maxDlta = [];
+      for (var i = 0; i < this.dlta.length; ++i) {
+        if (i == this.dlta.length - 1) {
+          maxDlta.push(1);
+        } else if (i == 0) {
+          maxDlta.push(NaN);
+        } else {
+          maxDlta.push(this.dlta[i - 1] - 1);
+        }
+      }
+      return maxDlta;
+    },
+  },
+  methods: {
+    ...mapMutations("arrayAbout", [
+      "generateArr",
+      "shuffleArr",
+      "sortArr",
+      "clearArr",
+      "exchangeElem",
+      "deleteElem",
+      "insertElem",
+      "selectElem",
+      "deselectElem",
+      "selectPart",
+      "deselectPart",
+      "changeOrder",
+      "changeAniInt",
+      "editElem",
+    ]),
+    stepSort() {
+      if (this.dataArr.length == 0 || this.dataArr.length == 1) {
+        return;
+      }
+      this.disabled = true;
+      // 计数器清零
+      this.timer = 0;
+      if (this.sortMethod[0] == 0) {
+        if (this.sortMethod[1] == 0) {
+          this.InsertSort();
+        } else if (this.sortMethod[1] == 1) {
+          this.BInsertSort();
+        } else if (this.sortMethod[1] == 2) {
+          this.ShellSort();
+        }
+      } else if (this.sortMethod[0] == 1) {
+        if (this.sortMethod[1] == 0) {
+          this.BubbleSort();
+        } else if (this.sortMethod[1] == 1) {
+          this.QuickSort();
+        }
+      } else if (this.sortMethod[0] == 2) {
+        if (this.sortMethod[1] == 0) {
+          this.SelectSort();
+        }
+      }
+      setTimeout(() => {
+        this.disabled = false;
+      }, this.aniInt * this.timer++);
+    },
+
+    // 处理增量序列长度变化
+    lenChange(newValue, oldValue) {
+      var i,
+        newDlta = this.dlta.concat([]);
+      console.log(this.dlta);
+      this.dlta.length = oldValue;
+      if (newValue > oldValue) {
+        for (i = 0; i < newValue - oldValue; ++i) {
+          this.dlta.unshift(this.dlta[0] + 2);
+        }
+      } else {
+        for (i = 0; i < oldValue - newValue; ++i) {
+          newDlta.shift();
+        }
+        newDlta[newValue - 1] = 1;
+        this.dlta = newDlta;
+      }
+      console.log(this.dlta);
+    },
+
+    // 处理增量序列内容变化
+    dltChange(newValue, _, index) {
+      var newDlta = this.dlta.concat([]);
+      newDlta[index] = newValue;
+      this.dlta = newDlta;
+    },
+
+    // 直接插入排序
+    InsertSort() {
+      // 深拷贝原数组
+      var newDataArr = convertToNumList(this.dataArr);
+      newDataArr.unshift(0);
+      setTimeout(() => {
+        this.insertElem({ index: 0, value: 0 });
+        this.selectElem(1);
+      }, this.aniInt * this.timer++);
+      var i, j;
+      for (i = 2; i <= newDataArr.length - 1; i++) {
+        ((i) => {
+          setTimeout(() => {
+            this.selectElem(i);
+          }, this.aniInt * this.timer++);
+        })(i);
+        if (
+          (this.ascendingOrder && newDataArr[i] < newDataArr[i - 1]) ||
+          (!this.ascendingOrder && newDataArr[i] > newDataArr[i - 1])
+        ) {
+          newDataArr[0] = newDataArr[i];
+          ((val) => {
+            setTimeout(() => {
+              this.editElem({ index: 0, value: val });
+              // this.exchangeElem([0, i]);
+            }, this.aniInt * this.timer++);
+          })(newDataArr[i]);
+          newDataArr[i] = newDataArr[i - 1];
+          ((i) => {
+            setTimeout(() => {
+              this.exchangeElem([i - 1, i]);
+            }, this.aniInt * this.timer++);
+          })(i);
+          for (
+            j = i - 2;
+            (this.ascendingOrder && newDataArr[0] < newDataArr[j]) ||
+            (!this.ascendingOrder && newDataArr[0] > newDataArr[j]);
+            j--
+          ) {
+            newDataArr[j + 1] = newDataArr[j];
+            ((j) => {
+              setTimeout(() => {
+                this.exchangeElem([j + 1, j]);
+              }, this.aniInt * this.timer++);
+            })(j);
+          }
+          newDataArr[j + 1] = newDataArr[0];
+        }
+      }
+      setTimeout(() => {
+        this.deleteElem(0);
+        this.deselectPart([0, this.dataArr.length - 1]);
+      }, this.aniInt * this.timer++);
+    },
+
+    // 折半插入排序
+    BInsertSort() {
+      var m, low, high, left, right;
+      // 深拷贝原数组
+      var newDataArr = convertToNumList(this.dataArr);
+      newDataArr.unshift(0);
+      setTimeout(() => {
+        this.insertElem({ index: 0, value: 0 });
+      }, this.aniInt * this.timer++);
+      for (var i = 2; i <= newDataArr.length - 1; ++i) {
+        newDataArr[0] = newDataArr[i];
+        ((val) => {
+          setTimeout(() => {
+            this.editElem({ index: 0, value: val });
+          }, this.aniInt * this.timer++);
+        })(newDataArr[i]);
+        low = 1;
+        high = i - 1;
+        ((l, h) => {
+          setTimeout(() => {
+            this.selectPart([l, h]);
+          }, this.aniInt * this.timer++);
+        })(low, high);
+        while (low <= high) {
+          m = Math.floor((low + high) / 2);
+          if (
+            (this.ascendingOrder && newDataArr[0] < newDataArr[m]) ||
+            (!this.ascendingOrder && newDataArr[0] > newDataArr[m])
+          ) {
+            ((m, h) => {
+              setTimeout(() => {
+                this.deselectPart([m, h]);
+              }, this.aniInt * this.timer++);
+            })(m, high);
+            high = m - 1;
+          } else {
+            ((l, m) => {
+              setTimeout(() => {
+                this.deselectPart([l, m]);
+              }, this.aniInt * this.timer++);
+            })(low, m);
+            low = m + 1;
+          }
+        }
+        left = high == i - 1 ? high + 1 : high;
+        right = high + 1;
+        ((l, r) => {
+          setTimeout(() => {
+            this.selectPart([l, r]);
+          }, this.aniInt * this.timer);
+        })(left, right);
+        ((l, r) => {
+          setTimeout(() => {
+            this.deselectPart([l, r]);
+          }, this.aniInt * this.timer + this.aniInt / 4);
+        })(left, right);
+        ((l, r) => {
+          setTimeout(() => {
+            this.selectPart([l, r]);
+          }, this.aniInt * this.timer + this.aniInt / 2);
+        })(left, right);
+        ((l, r) => {
+          setTimeout(() => {
+            this.deselectPart([l, r]);
+          }, this.aniInt * this.timer++ + (3 * this.aniInt) / 4);
+        })(left, right);
+        for (var j = i - 1; j >= high + 1; --j) {
+          newDataArr[j + 1] = newDataArr[j];
+          ((j) => {
+            setTimeout(() => {
+              this.exchangeElem([j, j + 1]);
+            }, this.aniInt * this.timer++);
+          })(j);
+        }
+        newDataArr[high + 1] = newDataArr[0];
+      }
+      setTimeout(() => {
+        this.deleteElem(0);
+      }, this.aniInt * this.timer++);
+      console.log(newDataArr);
+    },
+
+    // 希尔排序
+    ShellSort() {
+      var newDataArr = convertToNumList(this.dataArr);
+      newDataArr.unshift(0);
+      setTimeout(() => {
+        this.insertElem({ index: 0, value: 0 });
+      }, this.aniInt * this.timer++);
+      for (var k = 0; k < this.dlta.length; ++k) {
+        this.ShellInsert(newDataArr, this.dlta[k]);
+      }
+      setTimeout(() => {
+        this.deleteElem(0);
+      }, this.aniInt * this.timer++);
+      console.log(newDataArr);
+    },
+    ShellInsert(newDataArr, dk) {
+      for (var i = dk + 1; i < newDataArr.length; ++i) {
+        if (i <= 2 * dk) {
+          ((i, dk) => {
+            setTimeout(() => {
+              this.selectElem(i - dk);
+            }, this.aniInt * this.timer++);
+          })(i, dk);
+        }
+        ((i) => {
+          setTimeout(() => {
+            this.selectElem(i);
+          }, this.aniInt * this.timer++);
+        })(i);
+        if (
+          (this.ascendingOrder && newDataArr[i] < newDataArr[i - dk]) ||
+          (!this.ascendingOrder && newDataArr[i] > newDataArr[i - dk])
+        ) {
+          newDataArr[0] = newDataArr[i];
+          ((val) => {
+            setTimeout(() => {
+              this.editElem({ index: 0, value: val });
+            }, this.aniInt * this.timer++);
+          })(newDataArr[i]);
+          for (
+            var j = i - dk;
+            j > 0 &&
+            ((this.ascendingOrder && newDataArr[0] < newDataArr[j]) ||
+              (!this.ascendingOrder && newDataArr[0] > newDataArr[j]));
+            j -= dk
+          ) {
+            newDataArr[j + dk] = newDataArr[j];
+            ((i, j) => {
+              setTimeout(() => {
+                this.exchangeElem([i, j]);
+              }, this.aniInt * this.timer++);
+            })(j, j + dk);
+          }
+          newDataArr[j + dk] = newDataArr[0];
+        }
+      }
+      ((len) => {
+        setTimeout(() => {
+          this.deselectPart([0, len - 1]);
+        }, this.aniInt * this.timer++);
+      })(newDataArr.length);
+    },
+
+    // 冒泡排序
+    BubbleSort() {
+      var newDataArr = convertToNumList(this.dataArr);
+      for (var j = 0; j < newDataArr.length - 1; ++j) {
+        for (var i = 0; i < newDataArr.length - 1 - j; ++i) {
+          ((i) => {
+            setTimeout(() => {
+              this.selectPart([i, i + 1]);
+            }, this.aniInt * this.timer++);
+          })(i);
+          if (
+            (this.ascendingOrder && newDataArr[i] > newDataArr[i + 1]) ||
+            (!this.ascendingOrder && newDataArr[i] < newDataArr[i + 1])
+          ) {
+            [newDataArr[i], newDataArr[i + 1]] = [
+              newDataArr[i + 1],
+              newDataArr[i],
+            ];
+            ((i) => {
+              setTimeout(() => {
+                this.exchangeElem([i, i + 1]);
+              }, this.aniInt * this.timer++);
+            })(i);
+          }
+          ((i) => {
+            setTimeout(() => {
+              this.deselectElem(i);
+            }, this.aniInt * this.timer++);
+          })(i);
+        }
+      }
+      setTimeout(() => {
+        this.deselectPart([0, newDataArr.length - 1]);
+      }, this.aniInt * this.timer++);
+      console.log(newDataArr);
+    },
+
+    // 快速排序
+    QuickSort() {
+      var newDataArr = convertToNumList(this.dataArr);
+      newDataArr.unshift(0);
+      setTimeout(() => {
+        this.insertElem({ index: 0, value: 0 });
+      }, this.aniInt * this.timer++);
+      this.QSort(newDataArr, 1, newDataArr.length - 1);
+      newDataArr.shift();
+      setTimeout(() => {
+        this.deleteElem(0);
+      }, this.aniInt * this.timer++);
+      console.log(newDataArr);
+    },
+    QSort(L, low, high) {
+      ((l, h) => {
+        setTimeout(() => {
+          this.selectPart([l, h]);
+        }, this.aniInt * this.timer + this.aniInt / 4);
+      })(low, high);
+      ((l, h) => {
+        setTimeout(() => {
+          this.deselectPart([l, h]);
+        }, this.aniInt * this.timer + this.aniInt / 2);
+      })(low, high);
+      ((l, h) => {
+        setTimeout(() => {
+          this.selectPart([l, h]);
+        }, this.aniInt * this.timer++ + (3 * this.aniInt) / 4);
+      })(low, high);
+      if (low < high) {
+        var pivotloc = this.Partition(L, low, high);
+        ((l, h) => {
+          setTimeout(() => {
+            this.deselectPart([l, h]);
+          }, this.aniInt * this.timer++);
+        })(low, high);
+        this.QSort(L, low, pivotloc - 1);
+        this.QSort(L, pivotloc + 1, high);
+      } else {
+        ((h) => {
+          setTimeout(() => {
+            this.deselectElem(h);
+          }, this.aniInt * this.timer++);
+        })(Math.min(low, high));
+      }
+    },
+    Partition(L, low, high) {
+      L[0] = L[low];
+      ((val) => {
+        setTimeout(() => {
+          this.editElem({ index: 0, value: val });
+        }, this.aniInt * this.timer++);
+      })(L[low]);
+      ((l, h) => {
+        setTimeout(() => {
+          this.deselectElem(l);
+          this.deselectElem(h);
+        }, this.aniInt * this.timer++);
+      })(low, high);
+      var pivotkey = L[low];
+      while (low < high) {
+        while (
+          low < high &&
+          ((this.ascendingOrder && L[high] >= pivotkey) ||
+            (!this.ascendingOrder && L[high] <= pivotkey))
+        ) {
+          --high;
+          ((h) => {
+            setTimeout(() => {
+              this.deselectElem(h);
+              this.selectElem(h + 1);
+            }, this.aniInt * this.timer++);
+          })(high);
+        }
+        L[low] = L[high];
+        ((l, val) => {
+          setTimeout(() => {
+            this.editElem({ index: l, value: val });
+          }, this.aniInt * this.timer++);
+        })(low, L[low]);
+        while (
+          low < high &&
+          ((this.ascendingOrder && L[low] <= pivotkey) ||
+            (!this.ascendingOrder && L[low] >= pivotkey))
+        ) {
+          ++low;
+          ((l) => {
+            setTimeout(() => {
+              this.deselectElem(l);
+              this.selectElem(l - 1);
+            }, this.aniInt * this.timer++);
+          })(low);
+        }
+        L[high] = L[low];
+        ((h, val) => {
+          setTimeout(() => {
+            this.editElem({ index: h, value: val });
+          }, this.aniInt * this.timer++);
+        })(high, L[high]);
+      }
+      L[low] = L[0];
+      ((l) => {
+        setTimeout(() => {
+          this.selectElem(l);
+        }, this.aniInt * this.timer - (3 * this.aniInt) / 4);
+      })(low);
+      ((l) => {
+        setTimeout(() => {
+          this.deselectElem(l);
+        }, this.aniInt * this.timer - this.aniInt / 2);
+      })(low);
+      ((l) => {
+        setTimeout(() => {
+          this.selectElem(l);
+        }, this.aniInt * this.timer - this.aniInt / 4);
+      })(low);
+      ((l, val) => {
+        setTimeout(() => {
+          this.deselectElem(l);
+          this.editElem({ index: l, value: val });
+        }, this.aniInt * this.timer++);
+      })(low, L[0]);
+      return low;
+    },
+
+    // 选择排序
+    SelectSort() {
+      var newDataArr = convertToNumList(this.dataArr);
+      newDataArr.unshift(0);
+      setTimeout(() => {
+        this.insertElem({ index: 0, value: 0 });
+      }, this.aniInt * this.timer++);
+      for (var i = 1; i < newDataArr.length; i++) {
+        ((l, h) => {
+          setTimeout(() => {
+            this.selectPart([l, h]);
+          }, this.aniInt * this.timer + this.aniInt / 4);
+        })(i, newDataArr.length - 1);
+        ((l, h) => {
+          setTimeout(() => {
+            this.deselectPart([l, h]);
+          }, this.aniInt * this.timer + this.aniInt / 2);
+        })(i, newDataArr.length - 1);
+        ((l, h) => {
+          setTimeout(() => {
+            this.selectPart([l, h]);
+          }, this.aniInt * this.timer++ + (3 * this.aniInt) / 4);
+        })(i, newDataArr.length - 1);
+        var m = i;
+        newDataArr[0] = newDataArr[i];
+        ((val) => {
+          setTimeout(() => {
+            this.editElem({ index: 0, value: val });
+          }, this.aniInt * this.timer++);
+        })(newDataArr[i]);
+        for (var j = i + 1; j < newDataArr.length; j++) {
+          ((j) => {
+            setTimeout(() => {
+              this.selectElem(j - 1);
+              this.deselectElem(j);
+            }, this.aniInt * this.timer++);
+          })(j);
+          if (
+            (this.ascendingOrder && newDataArr[j] < newDataArr[m]) ||
+            (!this.ascendingOrder && newDataArr[j] > newDataArr[m])
+          ) {
+            m = j;
+            newDataArr[0] = newDataArr[j];
+            ((val) => {
+              setTimeout(() => {
+                this.editElem({ index: 0, value: val });
+              }, this.aniInt * this.timer++);
+            })(newDataArr[j]);
+          }
+        }
+        [newDataArr[i], newDataArr[m]] = [newDataArr[m], newDataArr[i]];
+        ((i, m, len) => {
+          setTimeout(() => {
+            this.exchangeElem([i, m]);
+            this.deselectPart([i, len]);
+          }, this.aniInt * this.timer++);
+        })(i, m, newDataArr.length - 1);
+      }
+      setTimeout(() => {
+        this.deleteElem(0);
+      }, this.aniInt * this.timer++);
+      newDataArr.shift();
+      console.log(newDataArr);
+    },
+  },
+  watch: {
+    aOrder(newValue) {
+      this.changeOrder(newValue);
+    },
+  },
+};
+</script>
+
+<style scoped>
+#tool-bar {
+  margin: 30px auto;
+  width: auto;
+}
+.box {
+  width: 95%;
+  margin-left: 20px;
+  margin-bottom: 30px;
+  border-width: 2px;
+  border-radius: 5px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  float: left;
+}
+.box.last {
+  margin-right: 20px;
+}
+.v-col {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+h1 {
+  font-size: 20px;
+  font-weight: bold;
+  height: 25px;
+  line-height: 25px;
+  margin-top: 18px;
+  margin-bottom: 5px;
+}
+h2 {
+  font-size: 17px;
+  font-weight: bold;
+  height: 20px;
+  line-height: 20px;
+  color: #1f2f3d;
+  margin-bottom: 2px;
+}
+p {
+  padding: 0 0 5px 5px;
+  text-align: center;
+  color: #1f2f3d;
+}
+.h-row {
+  margin-bottom: 5px;
+  padding: 1% 6% 0 6%;
+}
+.i-row {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+.i-row.s-row {
+  margin-top: 15px;
+}
+.m-row {
+  margin-bottom: 15px;
+}
+.block {
+  text-align: center;
+}
+.s-line {
+  line-height: 44px;
+}
+</style>
