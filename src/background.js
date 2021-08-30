@@ -1,6 +1,6 @@
 'use strict'
 
-import { app, protocol, BrowserWindow, Menu, globalShortcut } from 'electron'
+import { app, protocol, BrowserWindow, Menu, globalShortcut, shell } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 const isDevelopment = process.env.NODE_ENV !== 'production'
@@ -19,15 +19,13 @@ function createMenu() {
         {
           label: 'Source Code (github repo)',
           click: () => {
-            var win = new BrowserWindow()
-            win.loadURL('https://ted-0711.github.io/')
+            shell.openExternal('https://github.com/Ted-0711/sort-visualization/')
           }
         },
         {
           label: 'Author (Ted Xu)',
           click: () => {
-            var win = new BrowserWindow()
-            win.loadURL('https://ted-0711.github.io/')
+            shell.openExternal('https://ted-0711.github.io/')
           }
         },
         {
