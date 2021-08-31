@@ -29,9 +29,6 @@ export default {
         title: {
           text: "数组排序可视化演示",
         },
-        legend: {
-          data: ["元素数值"],
-        },
         xAxis: {
           type: "category",
           data: this.idArr,
@@ -80,14 +77,14 @@ export default {
                   type: "max",
                   name: "最大值",
                   itemStyle: {
-                    color: '#409EFF'
+                    color: '#909399'
                   }
                 },
                 {
                   type: "min",
                   name: "最小值",
                   itemStyle: {
-                    color: '#409EFF'
+                    color: '#909399'
                   },
                   symbolRotate: 180,
                   label: {
@@ -102,7 +99,7 @@ export default {
                   type: "average",
                   name: "平均值",
                   itemStyle: {
-                    color: '#409EFF'
+                    color: '#909399'
                   },
                 },
               ],

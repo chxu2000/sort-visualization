@@ -462,39 +462,62 @@ export default {
       this.dlta = newDlta;
     },
 
+    // 延时选中单个元素
+    selectElemWithDelay(index, color = "#E6A23C") {
+      ((i, c) => {
+        setTimeout(() => {
+          this.selectElem([i, c]);
+        }, this.aniInt * this.timer++);
+      })(index, color);
+    },
+
+    // 延时反选单个元素
+    deselectElemWithDelay(index) {
+      ((i) => {
+        setTimeout(() => {
+          this.deselectElem(i);
+        }, this.aniInt * this.timer++);
+      })(index);
+    },
+
+    // 延时选中某部分元素
+    selectPartWithDelay(index1, index2, color = "#E6A23C") {
+      ((i, j, c) => {
+        setTimeout(() => {
+          this.selectPart([i, j, c]);
+        }, this.aniInt * this.timer++);
+      })(index1, index2, color);
+    },
+
+    // 延时反选某部分元素
+    deselectPartWithDelay(index1, index2) {
+      ((i, j) => {
+        setTimeout(() => {
+          this.deselectPart([i, j]);
+        }, this.aniInt * this.timer++);
+      })(index1, index2);
+    },
+
     // 直接插入排序
     InsertSort() {
       // 深拷贝原数组
       var newDataArr = convertToNumList(this.dataArr);
       newDataArr.unshift(0);
-      setTimeout(() => {
-        this.insertElem({ index: 0, value: 0 });
-        this.selectElem(1);
-      }, this.aniInt * this.timer++);
+      this.selectElemWithDelay(0);
       var i, j;
       for (i = 2; i <= newDataArr.length - 1; i++) {
-        ((i) => {
-          setTimeout(() => {
-            this.selectElem(i);
-          }, this.aniInt * this.timer++);
-        })(i);
+        this.selectElemWithDelay(i - 1);
         if (
           (this.ascendingOrder && newDataArr[i] < newDataArr[i - 1]) ||
           (!this.ascendingOrder && newDataArr[i] > newDataArr[i - 1])
         ) {
           newDataArr[0] = newDataArr[i];
-          ((val) => {
-            setTimeout(() => {
-              this.editElem({ index: 0, value: val });
-              // this.exchangeElem([0, i]);
-            }, this.aniInt * this.timer++);
-          })(newDataArr[i]);
           newDataArr[i] = newDataArr[i - 1];
           ((i) => {
             setTimeout(() => {
               this.exchangeElem([i - 1, i]);
             }, this.aniInt * this.timer++);
-          })(i);
+          })(i - 1);
           for (
             j = i - 2;
             (this.ascendingOrder && newDataArr[0] < newDataArr[j]) ||
@@ -506,13 +529,12 @@ export default {
               setTimeout(() => {
                 this.exchangeElem([j + 1, j]);
               }, this.aniInt * this.timer++);
-            })(j);
+            })(j - 1);
           }
           newDataArr[j + 1] = newDataArr[0];
         }
       }
       setTimeout(() => {
-        this.deleteElem(0);
         this.deselectPart([0, this.dataArr.length - 1]);
       }, this.aniInt * this.timer++);
     },
@@ -523,79 +545,52 @@ export default {
       // 深拷贝原数组
       var newDataArr = convertToNumList(this.dataArr);
       newDataArr.unshift(0);
-      setTimeout(() => {
-        this.insertElem({ index: 0, value: 0 });
-      }, this.aniInt * this.timer++);
+      // setTimeout(() => {
+      //   this.insertElem({ index: 0, value: 0 });
+      // }, this.aniInt * this.timer++);
       for (var i = 2; i <= newDataArr.length - 1; ++i) {
         newDataArr[0] = newDataArr[i];
-        ((val) => {
-          setTimeout(() => {
-            this.editElem({ index: 0, value: val });
-          }, this.aniInt * this.timer++);
-        })(newDataArr[i]);
+        this.selectElemWithDelay(i - 1);
         low = 1;
         high = i - 1;
         ((l, h) => {
           setTimeout(() => {
             this.selectPart([l, h]);
           }, this.aniInt * this.timer++);
-        })(low, high);
+        })(low - 1, high - 1);
         while (low <= high) {
           m = Math.floor((low + high) / 2);
           if (
             (this.ascendingOrder && newDataArr[0] < newDataArr[m]) ||
             (!this.ascendingOrder && newDataArr[0] > newDataArr[m])
           ) {
-            ((m, h) => {
-              setTimeout(() => {
-                this.deselectPart([m, h]);
-              }, this.aniInt * this.timer++);
-            })(m, high);
+            this.deselectPartWithDelay(m - 1, high - 1);
             high = m - 1;
           } else {
-            ((l, m) => {
-              setTimeout(() => {
-                this.deselectPart([l, m]);
-              }, this.aniInt * this.timer++);
-            })(low, m);
+            this.deselectPartWithDelay(low - 1, m - 1);
             low = m + 1;
           }
         }
         left = high == i - 1 ? high + 1 : high;
         right = high + 1;
-        ((l, r) => {
-          setTimeout(() => {
-            this.selectPart([l, r]);
-          }, this.aniInt * this.timer);
-        })(left, right);
-        ((l, r) => {
-          setTimeout(() => {
-            this.deselectPart([l, r]);
-          }, this.aniInt * this.timer + this.aniInt / 4);
-        })(left, right);
-        ((l, r) => {
-          setTimeout(() => {
-            this.selectPart([l, r]);
-          }, this.aniInt * this.timer + this.aniInt / 2);
-        })(left, right);
-        ((l, r) => {
-          setTimeout(() => {
-            this.deselectPart([l, r]);
-          }, this.aniInt * this.timer++ + (3 * this.aniInt) / 4);
-        })(left, right);
+        this.shinePart(left - 1 < 0 ? 0 : left - 1, right - 1, left !== right);
+        if (left === right) {
+          continue;
+        }
         for (var j = i - 1; j >= high + 1; --j) {
           newDataArr[j + 1] = newDataArr[j];
-          ((j) => {
-            setTimeout(() => {
-              this.exchangeElem([j, j + 1]);
-            }, this.aniInt * this.timer++);
-          })(j);
         }
+        ((i, h) => {
+          setTimeout(() => {
+            this.moveElem([i, h + 1]);
+          }, this.aniInt * this.timer++);
+        })(i - 1, high - 1);
+        this.deselectPartWithDelay(
+          left - 1 < 0 ? 0 : left - 1,
+          right < this.dataArr.length ? right : this.dataArr.length - 1
+        );
         newDataArr[high + 1] = newDataArr[0];
       }
-      setTimeout(() => {
-        this.deleteElem(0);
-      }, this.aniInt * this.timer++);
       console.log(newDataArr);
     },
 
@@ -603,41 +598,20 @@ export default {
     ShellSort() {
       var newDataArr = convertToNumList(this.dataArr);
       newDataArr.unshift(0);
-      setTimeout(() => {
-        this.insertElem({ index: 0, value: 0 });
-      }, this.aniInt * this.timer++);
       for (var k = 0; k < this.dlta.length; ++k) {
         this.ShellInsert(newDataArr, this.dlta[k]);
       }
-      setTimeout(() => {
-        this.deleteElem(0);
-      }, this.aniInt * this.timer++);
       console.log(newDataArr);
     },
     ShellInsert(newDataArr, dk) {
       for (var i = dk + 1; i < newDataArr.length; ++i) {
-        if (i <= 2 * dk) {
-          ((i, dk) => {
-            setTimeout(() => {
-              this.selectElem(i - dk);
-            }, this.aniInt * this.timer++);
-          })(i, dk);
-        }
-        ((i) => {
-          setTimeout(() => {
-            this.selectElem(i);
-          }, this.aniInt * this.timer++);
-        })(i);
+        this.selectElemWithDelay(i - 1);
+        this.selectElemWithDelay(i - 1 - dk);
         if (
           (this.ascendingOrder && newDataArr[i] < newDataArr[i - dk]) ||
           (!this.ascendingOrder && newDataArr[i] > newDataArr[i - dk])
         ) {
           newDataArr[0] = newDataArr[i];
-          ((val) => {
-            setTimeout(() => {
-              this.editElem({ index: 0, value: val });
-            }, this.aniInt * this.timer++);
-          })(newDataArr[i]);
           for (
             var j = i - dk;
             j > 0 &&
@@ -650,16 +624,26 @@ export default {
               setTimeout(() => {
                 this.exchangeElem([i, j]);
               }, this.aniInt * this.timer++);
-            })(j, j + dk);
+            })(j - 1, j - 1 + dk);
+            ((j, dk) => {
+              setTimeout(() => {
+                this.deselectElem(j - 1 + dk);
+                console.log(j - 1 - dk);
+                if (j - 1 - dk >= 0) {
+                  this.selectElem([j - 1 - dk]);
+                }
+              }, this.aniInt * this.timer++);
+            })(j, dk);
           }
           newDataArr[j + dk] = newDataArr[0];
         }
+        this.deselectPartWithDelay(0, this.dataArr.length - 1);
       }
       ((len) => {
         setTimeout(() => {
           this.deselectPart([0, len - 1]);
         }, this.aniInt * this.timer++);
-      })(newDataArr.length);
+      })(this.dataArr.length);
     },
 
     // 冒泡排序
@@ -770,7 +754,7 @@ export default {
           ((h) => {
             setTimeout(() => {
               this.deselectElem(h);
-              this.selectElem(h + 1);
+              this.selectElem([h + 1]);
             }, this.aniInt * this.timer++);
           })(high);
         }
@@ -789,7 +773,7 @@ export default {
           ((l) => {
             setTimeout(() => {
               this.deselectElem(l);
-              this.selectElem(l - 1);
+              this.selectElem([l - 1]);
             }, this.aniInt * this.timer++);
           })(low);
         }
@@ -803,7 +787,7 @@ export default {
       L[low] = L[0];
       ((l) => {
         setTimeout(() => {
-          this.selectElem(l);
+          this.selectElem([l]);
         }, this.aniInt * this.timer - (3 * this.aniInt) / 4);
       })(low);
       ((l) => {
@@ -813,7 +797,7 @@ export default {
       })(low);
       ((l) => {
         setTimeout(() => {
-          this.selectElem(l);
+          this.selectElem([l]);
         }, this.aniInt * this.timer - this.aniInt / 4);
       })(low);
       ((l, val) => {
@@ -858,7 +842,7 @@ export default {
         for (var j = i + 1; j < newDataArr.length; j++) {
           ((j) => {
             setTimeout(() => {
-              this.selectElem(j - 1);
+              this.selectElem([j - 1]);
               this.deselectElem(j);
             }, this.aniInt * this.timer++);
           })(j);
@@ -943,7 +927,7 @@ export default {
           ++j;
           ((j) => {
             setTimeout(() => {
-              this.selectElem(j - 1);
+              this.selectElem([j - 1]);
               this.deselectElem(j);
             }, this.aniInt * this.timer++);
           })(j);
@@ -960,7 +944,7 @@ export default {
         ((s, j) => {
           setTimeout(() => {
             this.exchangeElem([s, j]);
-            this.selectElem(s);
+            this.selectElem([s]);
           }, this.aniInt * this.timer++);
         })(s, j);
         s = j;

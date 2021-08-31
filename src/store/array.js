@@ -19,7 +19,7 @@ export default {
         state.dataArr.push({
           value: Math.floor(Math.random() * 100) - 50,
           itemStyle: {
-            color: null
+            color: "#409EFF"
           }
         })
       }
@@ -74,7 +74,7 @@ export default {
       state.dataArr.splice(index, 0, {
         value: value,
         itemStyle: {
-          color: null
+          color: '#409EFF'
         }
       })
     },
@@ -86,25 +86,25 @@ export default {
       state.dataArr = newDataArr
     },
     // 选中某元素
-    selectElem(state, index) {
+    selectElem(state, [index, color='#E6A23C']) {
       console.log("selectElem", index)
       var newDataArr = state.dataArr.concat([])
-      newDataArr[index].itemStyle.color = 'green'
+      newDataArr[index].itemStyle.color = color
       state.dataArr = newDataArr
     },
     // 反选某元素
     deselectElem(state, index) {
       console.log("deselectElem", index)
       var newDataArr = state.dataArr.concat([])
-      newDataArr[index].itemStyle.color = null
+      newDataArr[index].itemStyle.color = '#409EFF'
       state.dataArr = newDataArr
     },
     // 选中某部分
-    selectPart(state, [index1, index2]) {
+    selectPart(state, [index1, index2, color='#E6A23C']) {
       console.log("selectPart", index1, index2)
       var newDataArr = state.dataArr.concat([])
       for (var i = index1; i <= index2; i++) {
-        newDataArr[i].itemStyle.color = 'green'
+        newDataArr[i].itemStyle.color = color
       }
       state.dataArr = newDataArr
     },
@@ -113,23 +113,7 @@ export default {
       console.log("deselectPart", index1, index2)
       var newDataArr = state.dataArr.concat([])
       for (var i = index1; i <= index2; i++) {
-        newDataArr[i].itemStyle.color = null
-      }
-      state.dataArr = newDataArr
-    },
-    // 选中某元素
-    selectElems(state, [index1, index2]) {
-      var newDataArr = state.dataArr.concat([])
-      for (var i = index1; i < index2; i++) {
-        newDataArr[i].itemStyle.color = 'green'
-      }
-      state.dataArr = newDataArr
-    },
-    // 反选某元素
-    deselectElems(state, [index1, index2]) {
-      var newDataArr = state.dataArr.concat([])
-      for (var i = index1; i < index2; i++) {
-        newDataArr[i].itemStyle.color = null
+        newDataArr[i].itemStyle.color = '#409EFF'
       }
       state.dataArr = newDataArr
     },

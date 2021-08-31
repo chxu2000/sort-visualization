@@ -39,11 +39,11 @@ body {
   width: 100%;
 }
 #chart {
-  height: 60%;
+  height: 50%;
   width: 100%;
 }
 #tool-bar {
-  height: 40%;
+  height: 50%;
   width: 100%;
 }
 </style>
