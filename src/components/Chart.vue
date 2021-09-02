@@ -12,14 +12,14 @@ export default {
     };
   },
   computed: {
-    ...mapState("arrayAbout", ['dataArr', 'idArr', 'aniInt']),
+    ...mapState("arrayAbout", ["dataArr", "idArr", "aniInt"]),
   },
   mounted() {
-    this.initChart()
-    this.generateArr(10)
+    this.initChart();
+    this.generateArr(10);
   },
   methods: {
-    ...mapMutations('arrayAbout', ['generateArr']),
+    ...mapMutations("arrayAbout", ["generateArr"]),
     initChart() {
       this.chartInstance = this.$echarts.init(this.$refs.chart);
       const initOption = {
@@ -53,7 +53,7 @@ export default {
             ) {
               return (arg.data.name + ": " + arg.data.value).toString();
             }
-            return (arg.dataIndex + ": " + arg.data).toString();
+            return arg.data.value;
           },
         },
         toolbox: {
@@ -77,19 +77,19 @@ export default {
                   type: "max",
                   name: "最大值",
                   itemStyle: {
-                    color: '#909399'
-                  }
+                    color: "#909399",
+                  },
                 },
                 {
                   type: "min",
                   name: "最小值",
                   itemStyle: {
-                    color: '#909399'
+                    color: "#909399",
                   },
                   symbolRotate: 180,
                   label: {
-                    padding: [23, 0, 0, 0]
-                  }
+                    padding: [23, 0, 0, 0],
+                  },
                 },
               ],
             },
@@ -99,7 +99,7 @@ export default {
                   type: "average",
                   name: "平均值",
                   itemStyle: {
-                    color: '#909399'
+                    color: "#909399",
                   },
                 },
               ],
@@ -111,6 +111,9 @@ export default {
             },
             barWidth: 30,
             data: this.dataArr,
+            lineStyle: {
+              color: "#909399",
+            },
           },
         ],
       };
@@ -129,10 +132,12 @@ export default {
           xAxis: {
             data: this.idArr,
           },
-          series: [{
-            data: newValue
-          }],
-        }
+          series: [
+            {
+              data: newValue,
+            },
+          ],
+        };
         this.chartInstance.setOption(newOption);
       },
     },
