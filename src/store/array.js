@@ -15,6 +15,8 @@ export default {
     // 生成随机数组
     generateArr(state, length) {
       for (var i = 0; i < length; i++) {
+        // 数组元素的id值数组，用于区分不同元素相同数值的情况
+        // nanoid()能够生成32位不重复的唯一uuid
         state.idArr.push(nanoid())
         state.dataArr.push({
           value: Math.floor(Math.random() * 100) - 50,
@@ -28,7 +30,9 @@ export default {
     shuffleArr(state) {
       var newIdArr = []
       var newDataArr = state.dataArr.concat([])
+      // 根据随即返回值对数组进行排序，大于、小于的比例各占一半，实现数组顺序的打乱
       newDataArr.sort(() => (0.5 - Math.random()))
+      // 找到对应值的uuid
       for (var i = 0; i < state.dataArr.length; i++) {
         var index = state.dataArr.indexOf(newDataArr[i])
         newIdArr.push(state.idArr[index])
@@ -41,6 +45,7 @@ export default {
     sortArr(state) {
       var newIdArr = []
       var newDataArr = state.dataArr.concat([])
+      // Array.sort()方法
       newDataArr.sort((a, b) => (state.ascendingOrder ? a.value - b.value : b.value - a.value))
       for (var i = 0; i < state.dataArr.length; i++) {
         var index = state.dataArr.indexOf(newDataArr[i])
@@ -80,28 +85,28 @@ export default {
     },
     // 修改某元素值
     editElem(state, { index, value }) {
-      console.log('editElem', index)
+      // console.log('editElem', index)
       var newDataArr = state.dataArr.concat([])
       newDataArr[index].value = value
       state.dataArr = newDataArr
     },
     // 选中某元素
     selectElem(state, [index, color='#E6A23C']) {
-      console.log("selectElem", index)
+      // console.log("selectElem", index)
       var newDataArr = state.dataArr.concat([])
       newDataArr[index].itemStyle.color = color
       state.dataArr = newDataArr
     },
     // 反选某元素
     deselectElem(state, index) {
-      console.log("deselectElem", index)
+      // console.log("deselectElem", index)
       var newDataArr = state.dataArr.concat([])
       newDataArr[index].itemStyle.color = '#409EFF'
       state.dataArr = newDataArr
     },
     // 选中某部分
     selectPart(state, [index1, index2, color='#E6A23C']) {
-      console.log("selectPart", index1, index2)
+      // console.log("selectPart", index1, index2)
       var newDataArr = state.dataArr.concat([])
       for (var i = index1; i <= index2; i++) {
         newDataArr[i].itemStyle.color = color
@@ -110,7 +115,7 @@ export default {
     },
     // 反选某部分
     deselectPart(state, [index1, index2]) {
-      console.log("deselectPart", index1, index2)
+      // console.log("deselectPart", index1, index2)
       var newDataArr = state.dataArr.concat([])
       for (var i = index1; i <= index2; i++) {
         newDataArr[i].itemStyle.color = '#409EFF'
@@ -119,7 +124,7 @@ export default {
     },
     // 移动某元素
     moveElem(state, [from, to]) {
-      console.log("moveElem", from, to);
+      // console.log("moveElem", from, to);
       var i, newDataArr = state.dataArr.concat([]), tempId = state.idArr[from], tempData = state.dataArr[from];
       if (from > to) {
         for (i = from; i > to; --i) {

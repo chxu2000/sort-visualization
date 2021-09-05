@@ -146,7 +146,7 @@
             <el-row class="h-row">
               <el-row class="m-row">
                 <el-row class="i-row">
-                  <h2>排序类型</h2>
+                  <h2>排序方向</h2>
                 </el-row>
                 <el-row class="i-row">
                   <el-radio
@@ -167,13 +167,13 @@
               </el-row>
               <el-row class="m-row">
                 <el-row class="i-row">
-                  <h2>排序方式</h2>
+                  <h2>排序种类</h2>
                 </el-row>
                 <el-row class="i-row">
                   <el-cascader
                     :disabled="disabled"
                     v-model="sortMethod"
-                    placeholder="请选择排序方式"
+                    placeholder="请选择排序种类"
                     :options="options"
                   >
                   </el-cascader>
@@ -363,11 +363,11 @@ export default {
       "editElem",
       "moveElem",
     ]),
-    shinePart(start, end, select = true) {
+    shinePart(start, end, select = true, color = "#E6A23C") {
       if (select) {
         ((l, h) => {
           setTimeout(() => {
-            this.selectPart([l, h]);
+            this.selectPart([l, h, color]);
           }, this.aniInt * this.timer - this.aniInt / 4);
         })(start, end);
         ((l, h) => {
@@ -377,7 +377,7 @@ export default {
         })(start, end);
         ((l, h) => {
           setTimeout(() => {
-            this.selectPart([l, h]);
+            this.selectPart([l, h, color]);
           }, this.aniInt * this.timer++ + this.aniInt / 4);
         })(start, end);
       } else {
@@ -388,7 +388,7 @@ export default {
         })(start, end);
         ((l, h) => {
           setTimeout(() => {
-            this.selectPart([l, h]);
+            this.selectPart([l, h, color]);
           }, this.aniInt * this.timer);
         })(start, end);
         ((l, h) => {
@@ -506,7 +506,7 @@ export default {
       this.selectElemWithDelay(0);
       var i, j;
       for (i = 2; i <= newDataArr.length - 1; i++) {
-        this.selectElemWithDelay(i - 1);
+        this.shinePart(i - 1, i - 1, true, "#F56C6C");
         if (
           (this.ascendingOrder && newDataArr[i] < newDataArr[i - 1]) ||
           (!this.ascendingOrder && newDataArr[i] > newDataArr[i - 1])
@@ -532,6 +532,9 @@ export default {
             })(j - 1);
           }
           newDataArr[j + 1] = newDataArr[0];
+          this.selectElemWithDelay(j);
+        } else {
+          this.selectElemWithDelay(i - 1);
         }
       }
       setTimeout(() => {
@@ -547,7 +550,8 @@ export default {
       newDataArr.unshift(0);
       for (var i = 2; i <= newDataArr.length - 1; ++i) {
         newDataArr[0] = newDataArr[i];
-        this.selectElemWithDelay(i - 1);
+        // this.selectElemWithDelay(i - 1);
+        this.shinePart(i - 1, i - 1, true, "#F56C6C");
         low = 1;
         high = i - 1;
         ((l, h) => {
@@ -602,7 +606,8 @@ export default {
     },
     ShellInsert(newDataArr, dk) {
       for (var i = dk + 1; i < newDataArr.length; ++i) {
-        this.selectElemWithDelay(i - 1);
+        this.shinePart(i - 1, i - 1, true, "#F56C6C");
+        // this.selectElemWithDelay(i - 1, "#F56C6C");
         this.selectElemWithDelay(i - 1 - dk);
         if (
           (this.ascendingOrder && newDataArr[i] < newDataArr[i - dk]) ||
@@ -647,10 +652,13 @@ export default {
     BubbleSort() {
       var newDataArr = convertToNumList(this.dataArr);
       for (var j = 0; j < newDataArr.length - 1; ++j) {
+        this.shinePart(0, 0, true, "#F56C6C");
         for (var i = 0; i < newDataArr.length - 1 - j; ++i) {
           ((i) => {
             setTimeout(() => {
-              this.selectPart([i, i + 1]);
+              this.selectElem([i + 1]);
+              // this.selectPart(i + 1, i + 1);
+              // this.selectPart([i, i + 1]);
             }, this.aniInt * this.timer++);
           })(i);
           if (
@@ -666,13 +674,22 @@ export default {
                 this.exchangeElem([i, i + 1]);
               }, this.aniInt * this.timer++);
             })(i);
+          } else {
+            ((i) => {
+              this.shinePart(i + 1, i + 1, true, "#F56C6C");
+            })(i);
           }
           ((i) => {
             setTimeout(() => {
               this.deselectElem(i);
-            }, this.aniInt * this.timer++);
+            }, this.aniInt * this.timer);
           })(i);
         }
+        ((j, l) => {
+          setTimeout(() => {
+            this.selectElem([l - j - 1]);
+          }, this.aniInt * this.timer++);
+        })(j, newDataArr.length);
       }
       setTimeout(() => {
         this.deselectPart([0, newDataArr.length - 1]);
@@ -701,8 +718,8 @@ export default {
       L[0] = L[low];
       ((l, h) => {
         setTimeout(() => {
-          this.deselectElem(l);
-          this.deselectElem(h);
+          this.selectElem([l, "#F56C6C"]);
+          this.selectElem([h, "#F56C6C"]);
         }, this.aniInt * this.timer++);
       })(low - 1, high - 1);
       var pivotkey = L[low];
@@ -716,7 +733,7 @@ export default {
           ((h) => {
             setTimeout(() => {
               this.selectElem([h + 1]);
-              this.deselectElem(h);
+              this.selectElem([h, "#F56C6C"]);
             }, this.aniInt * this.timer++);
           })(high - 1);
         }
@@ -735,7 +752,7 @@ export default {
           ((l) => {
             setTimeout(() => {
               this.selectElem([l - 1]);
-              this.deselectElem(l);
+              this.selectElem([l, "#F56C6C"]);
             }, this.aniInt * this.timer++);
           })(low - 1);
         }
@@ -755,43 +772,51 @@ export default {
       var newDataArr = convertToNumList(this.dataArr);
       newDataArr.unshift(0);
       for (var i = 1; i < newDataArr.length; i++) {
-        this.shinePart(i - 1, this.dataArr.length - 1);
+        // this.shinePart(i - 1, this.dataArr.length - 1);
         var m = i;
         newDataArr[0] = newDataArr[i];
-        this.deselectElemWithDelay(i - 1);
+        this.selectElemWithDelay(i - 1, "#F56C6C");
         for (var j = i + 1; j < newDataArr.length; j++) {
           ((j) => {
             setTimeout(() => {
-              this.deselectElem(j);
+              this.selectElem([j]);
             }, this.aniInt * this.timer++);
           })(j - 1);
           if (
             (this.ascendingOrder && newDataArr[j] < newDataArr[m]) ||
             (!this.ascendingOrder && newDataArr[j] > newDataArr[m])
           ) {
-            console.log('test1');
-            this.selectElemWithDelay(m - 1);
+            console.log("test1");
+            // this.deselectElemWithDelay(m - 1);
+            ((j, m) => {
+              setTimeout(() => {
+                this.deselectElem(m);
+                this.selectElem([j, "#F56C6C"]);
+              }, this.aniInt * this.timer++);
+            })(j - 1, m - 1);
             m = j;
             newDataArr[0] = newDataArr[j];
           } else {
-            console.log('test2');
+            console.log("test2");
             ((j) => {
               setTimeout(() => {
-                this.selectElem([j - 1]);
+                this.deselectElem(j - 1);
               }, this.aniInt * this.timer);
             })(j);
           }
         }
         [newDataArr[i], newDataArr[m]] = [newDataArr[m], newDataArr[i]];
-        ((i, m, len) => {
+        ((i, m) => {
           setTimeout(() => {
             this.exchangeElem([i, m]);
-            this.deselectPart([i, len]);
+            this.selectElem([i]);
+            // this.deselectPart([i, len]);
           }, this.aniInt * this.timer++);
-        })(i - 1, m - 1, this.dataArr.length - 1);
+        })(i - 1, m - 1);
       }
       newDataArr.shift();
       console.log(newDataArr);
+      this.deselectPartWithDelay(0, newDataArr.length - 1);
     },
 
     // 堆排序
@@ -799,39 +824,40 @@ export default {
       var i,
         newDataArr = convertToNumList(this.dataArr);
       newDataArr.unshift(0);
-      // setTimeout(() => {
-      //   this.insertElem({ index: 0, value: 0 });
-      // }, this.aniInt * this.timer++);
       for (i = Math.floor((newDataArr.length - 1) / 2); i > 0; --i) {
-        this.HeapAdjust(newDataArr, i, newDataArr.length - 1);
+        this.HeapAdjust(newDataArr, i, newDataArr.length - 1, i === 1);
       }
       for (i = newDataArr.length - 1; i > 1; --i) {
         [newDataArr[1], newDataArr[i]] = [newDataArr[i], newDataArr[1]];
         ((i) => {
           setTimeout(() => {
-            this.selectPart([0, i]);
-            this.exchangeElem([0, i]);
+            this.selectElem([0]);
+            this.selectElem([i]);
           }, this.aniInt * this.timer++);
           setTimeout(() => {
+            this.exchangeElem([0, i]);
             this.deselectPart([0, i]);
           }, this.aniInt * this.timer++);
         })(i - 1);
-        this.HeapAdjust(newDataArr, 1, i - 1);
+        this.HeapAdjust(newDataArr, 1, i - 1, false);
       }
       newDataArr.shift();
-      // setTimeout(() => {
-      //   this.deleteElem(0);
-      // }, this.aniInt * this.timer++);
       console.log(newDataArr);
     },
     HeapAdjust(H, s, m) {
+      var s1 = s,
+        m1 = m;
+      console.log("s", s, "m", m);
+      if (s === m) {
+        return;
+      }
       this.shinePart(s - 1, m - 1);
       var rc = H[s];
-      this.deselectElemWithDelay(s - 1);
+      this.selectElemWithDelay(s - 1, "#F56C6C");
       for (var j = 2 * s; j <= m; j *= 2) {
         ((j) => {
           setTimeout(() => {
-            this.deselectElem(j);
+            this.selectElem([j, "#F56C6C"]);
           }, this.aniInt * this.timer++);
         })(j - 1);
         if (
@@ -843,7 +869,7 @@ export default {
           ((j) => {
             setTimeout(() => {
               this.selectElem([j - 1]);
-              this.deselectElem(j);
+              this.selectElem([j, "#F56C6C"]);
             }, this.aniInt * this.timer++);
           })(j - 1);
         }
@@ -865,6 +891,7 @@ export default {
         s = j;
       }
       H[s] = rc;
+      this.deselectPartWithDelay(s1 - 1, m1 - 1);
     },
 
     // 归并排序
@@ -887,7 +914,7 @@ export default {
           end2 = high;
 
           this.shinePart(start1, end1 - 1);
-          this.shinePart(start2, end2 - 1);
+          this.shinePart(start2, end2 - 1, true, "#F56C6C");
 
           while (start1 < end1 && start2 < end2) {
             if (
