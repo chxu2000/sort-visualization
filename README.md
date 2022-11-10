@@ -27,7 +27,7 @@ npm run lint
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
 
-## Final Effects
+## Final Results
 
 ![image-20210902142722586](README.assets/image-20210902142722586.png)
 
